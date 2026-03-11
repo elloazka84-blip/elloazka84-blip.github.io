@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kebijakan Privasi CalFin</title>
+    <style>
+      :root {
+        --bg: #eef5fb;
+        --card: rgba(255, 255, 255, 0.92);
+        --ink: #16324a;
+        --muted: #4a6175;
+        --line: rgba(22, 50, 74, 0.12);
+        --accent: #1d6fa3;
+        --accent-soft: rgba(29, 111, 163, 0.1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Gill Sans", "Trebuchet MS", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, #ffffff 0%, rgba(255,255,255,0) 34%),
+          linear-gradient(160deg, #eef5fb 0%, #f8fbfe 48%, #fff5eb 100%);
+        line-height: 1.65;
+      }
+
+      .shell {
+        width: min(880px, calc(100% - 32px));
+        margin: 32px auto 56px;
+      }
+
+      .hero,
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        box-shadow: 0 18px 40px rgba(18, 43, 67, 0.12);
+        overflow: hidden;
+      }
+
+      .hero {
+        padding: 24px 24px 20px;
+        margin-bottom: 16px;
+      }
+
+      .hero::before,
+      .card::before {
+        content: "";
+        display: block;
+        height: 4px;
+        background: linear-gradient(90deg, #143d69, #5da8d8, #f08558);
+      }
+
+      h1 {
+        margin: 14px 0 8px;
+        font-size: clamp(28px, 4vw, 38px);
+        line-height: 1.1;
+      }
+
+      .subtitle {
+        margin: 0;
+        color: var(--muted);
+        font-size: 16px;
+      }
+
+      .meta {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 14px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .card {
+        padding: 0 24px 24px;
+      }
+
+      h2 {
+        margin: 22px 0 10px;
+        font-size: 22px;
+      }
+
+      p,
+      li {
+        font-size: 16px;
+        color: #314b60;
+      }
+
+      ul {
+        margin: 10px 0 0;
+        padding-left: 22px;
+      }
+
+      .note {
+        margin-top: 18px;
+        padding: 14px 16px;
+        border-radius: 16px;
+        border: 1px solid rgba(240, 133, 88, 0.22);
+        background: rgba(255, 243, 230, 0.82);
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      @media (max-width: 640px) {
+        .shell {
+          width: min(100% - 20px, 100%);
+          margin: 16px auto 28px;
+        }
+
+        .hero,
+        .card {
+          border-radius: 20px;
+        }
+
+        .hero,
+        .card {
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <p class="subtitle">CalFin Indonesia</p>
+        <h1>Kebijakan Privasi</h1>
+        <p class="subtitle">
+          Penjelasan ringkas tentang data yang diproses saat Anda menggunakan CalFin.
+        </p>
+        <div class="meta">Berlaku mulai: 7 Maret 2026</div>
+      </section>
+
+      <section class="card">
+        <h2>Ringkasan</h2>
+        <ul>
+          <li>CalFin tidak mewajibkan akun pengguna.</li>
+          <li>CalFin tidak memiliki backend untuk menyimpan data pengguna.</li>
+          <li>Sebagian besar perhitungan dilakukan langsung di perangkat.</li>
+          <li>CalFin menggunakan Google AdMob untuk menampilkan iklan banner Android.</li>
+          <li>CalFin dapat mengambil data referensi publik dari situs resmi bank.</li>
+          <li>CalFin dapat membuka tautan eksternal yang Anda pilih sendiri.</li>
+        </ul>
+
+        <h2>Data yang Diproses di Perangkat</h2>
+        <p>
+          CalFin memproses input simulasi yang Anda masukkan, seperti nominal pinjaman,
+          tenor, bunga, target tabungan, nominal deposito, dan frekuensi transfer.
+        </p>
+        <p>
+          Pada fitur prospek KPR, CalFin juga dapat memproses data yang Anda masukkan sendiri,
+          seperti nama, nomor telepon, kota, penghasilan, dan catatan.
+        </p>
+
+        <h2>Penyimpanan Data</h2>
+        <p>
+          CalFin tidak mengunggah data simulasi atau data prospek ke server CalFin.
+          Data diproses di memori aplikasi saat aplikasi digunakan. Jika Anda menyalin data
+          ke clipboard, data tersebut akan berada di clipboard perangkat sampai Anda menggantinya.
+        </p>
+
+        <h2>Iklan dan SDK Pihak Ketiga</h2>
+        <p>
+          CalFin menggunakan Google Mobile Ads SDK melalui Google AdMob untuk memuat
+          iklan banner di Android. SDK ini dapat memproses identifier iklan atau
+          identifier perangkat serupa, informasi aplikasi dan perangkat, alamat IP,
+          informasi jaringan, sinyal performa dasar, serta interaksi dasar dengan iklan
+          untuk penyajian iklan dan pencegahan fraud.
+        </p>
+
+        <h2>Akses Internet dan Referensi Publik</h2>
+        <p>
+          CalFin menggunakan internet untuk mengambil referensi umum dari sumber resmi bank
+          , memuat iklan banner dari Google AdMob, dan untuk membuka tautan eksternal yang
+          Anda pilih sendiri. Jika internet tidak tersedia, aplikasi memakai data lokal
+          atau fallback agar simulasi tetap berjalan.
+        </p>
+
+        <h2>Tautan dan Layanan Pihak Ketiga</h2>
+        <p>
+          CalFin dapat menggunakan atau membuka layanan pihak ketiga seperti Google AdMob,
+          situs bank, Google Maps, WhatsApp, Google Sheets, atau browser perangkat.
+          Setelah Anda keluar dari CalFin dan membuka layanan tersebut, penggunaan data
+          Anda akan mengikuti kebijakan privasi layanan pihak ketiga masing-masing.
+        </p>
+
+        <h2>Izin Aplikasi</h2>
+        <ul>
+          <li><strong>INTERNET</strong>, untuk mengambil referensi publik dan membuka layanan online.</li>
+          <li><strong>ACCESS_NETWORK_STATE</strong>, untuk memeriksa kondisi jaringan dan fallback offline.</li>
+        </ul>
+
+        <h2>Pembagian Data</h2>
+        <p>
+          CalFin tidak menjual data pribadi. Data hanya dapat keluar dari aplikasi jika Anda
+          sendiri memilih tindakan seperti menyalin ke clipboard, membuka WhatsApp,
+          membuka Google Sheets, atau membuka tautan eksternal. Selain itu, SDK iklan
+          pihak ketiga dapat menerima data teknis yang diperlukan untuk penyajian iklan
+          dan pencegahan fraud.
+        </p>
+
+        <h2>Kontak</h2>
+        <p>
+          Untuk pertanyaan privasi, gunakan alamat email pengembang yang tercantum pada
+          listing resmi Google Play CalFin saat aplikasi dipublikasikan.
+        </p>
+
+        <div class="note">
+          Dokumen halaman ini diselaraskan dengan file <code>PRIVACY_POLICY.md</code> di repo
+          CalFin dan dapat dipakai sebagai dasar URL publik untuk Google Play.
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
