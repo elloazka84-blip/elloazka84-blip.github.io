@@ -11,5 +11,17 @@
         "15:8B:17:79:EE:CB:EF:71:9E:F4:D5:B3:08:B6:7E:D5:43:57:5A:81:79:C1:DD:CF:68:21:D9:39:F3:C9:BF:83"
       ]
     }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.syaifuleffendi.calfin.qa",
+      "sha256_cert_fingerprints": [
+        "94:45:C0:AF:88:CA:61:F5:60:F3:9A:2C:DD:F2:A9:C7:96:1B:13:9F:AB:BB:31:64:65:35:EB:26:07:F5:3E:9D"
+      ]
+    }
   }
 ]
