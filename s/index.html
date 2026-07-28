@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#16324a" />
+    <title>Simulasi CalFin</title>
+    <meta name="description" content="Buka simulasi CalFin ini di aplikasi — hitung ulang dengan angka Anda sendiri." />
+    <meta property="og:title" content="Simulasi CalFin" />
+    <meta property="og:description" content="Buka simulasi ini di CalFin dan hitung ulang dengan angka Anda sendiri." />
+    <meta property="og:type" content="website" />
+    <!-- Halaman ini hanya jembatan deep link; tidak perlu diindeks. -->
+    <meta name="robots" content="noindex,nofollow" />
+    <style>
+      :root {
+        --bg: linear-gradient(160deg, #eef5fb 0%, #f8fbfe 48%, #fff5eb 100%);
+        --surface: rgba(255, 255, 255, 0.94);
+        --border: rgba(22, 50, 74, 0.12);
+        --ink: #16324a;
+        --muted: #4a6175;
+        --accent: #1d6fa3;
+        --accent-ink: #ffffff;
+        --shadow: 0 18px 40px rgba(18, 43, 67, 0.12);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: linear-gradient(160deg, #0d1b28 0%, #101f2e 48%, #1a1c22 100%);
+          --surface: rgba(20, 34, 48, 0.92);
+          --border: rgba(180, 205, 225, 0.16);
+          --ink: #e8f0f7;
+          --muted: #a2b6c7;
+          --accent: #58b0e4;
+          --accent-ink: #06202f;
+          --shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+        }
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Gill Sans", "Trebuchet MS", -apple-system, sans-serif;
+      }
+
+      .card {
+        width: min(560px, calc(100% - 32px));
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: var(--shadow);
+      }
+
+      h1 { margin: 0 0 8px; font-size: 28px; }
+      p { margin: 0 0 14px; color: var(--muted); line-height: 1.6; }
+
+      .cta {
+        display: block;
+        margin: 18px 0 10px;
+        padding: 15px 20px;
+        border-radius: 14px;
+        background: var(--accent);
+        color: var(--accent-ink);
+        font-weight: 700;
+        font-size: 17px;
+        text-align: center;
+        text-decoration: none;
+      }
+
+      .cta.secondary {
+        background: transparent;
+        color: var(--accent);
+        border: 1.5px solid var(--accent);
+      }
+
+      dl {
+        margin: 0 0 4px;
+        border-top: 1px solid var(--border);
+      }
+
+      .row {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 11px 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      dt { color: var(--muted); font-size: 15px; }
+      dd {
+        margin: 0;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        text-align: right;
+      }
+
+      .note { font-size: 13px; margin: 14px 0 0; }
+      [hidden] { display: none !important; }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <h1>Simulasi CalFin</h1>
+      <p id="lede">Seseorang membagikan hasil simulasi ini kepada Anda.</p>
+
+      <section id="preview" hidden>
+        <dl id="rows"></dl>
+        <p class="note">
+          Angka di atas adalah milik pengirim. Penghasilan tidak pernah ikut
+          dalam link ini — di aplikasi, Anda mengisi angka sendiri dan melihat
+          kesimpulan versi Anda.
+        </p>
+      </section>
+
+      <a class="cta" id="open-app" href="#" hidden>Buka di aplikasi CalFin</a>
+      <a class="cta" id="play" href="#">Dapatkan CalFin di Google Play</a>
+      <p class="note">
+        Sudah punya CalFin? Ketuk ulang link ini dari aplikasi chat, simulasi akan
+        terbuka otomatis dan sudah terisi.
+      </p>
+    </main>
+
+    <script>
+      (function () {
+        'use strict';
+
+        var PACKAGE = 'com.syaifuleffendi.calfin';
+        // Batas yang sama dengan sisi app (lib/domain/share_payload.dart) supaya
+        // halaman ini tidak pernah merender token raksasa atau zip bomb.
+        var MAX_TOKEN_CHARS = 2000;
+        var MAX_INFLATED_BYTES = 8 * 1024;
+        var PAYLOAD_VERSION = 1;
+        var MODULES = {
+          kpr: 'KPR',
+          cicilan: 'Cicilan',
+          deposito: 'Deposito',
+          target: 'Target',
+          transfer: 'Transfer'
+        };
+        var LABELS = {
+          price: ['Harga properti', 'idr'],
+          principal: ['Pokok pinjaman', 'idr'],
+          dp_pct: ['Uang muka', 'pct'],
+          rate_pct: ['Bunga', 'pct'],
+          tenor_m: ['Tenor', 'months'],
+          fix_m: ['Masa fixed', 'months']
+        };
+
+        var params = new URLSearchParams(location.search);
+
+        // --- Tombol Play Store dengan Install Referrer utuh (§F3 aturan 5) -----
+        // Nilai UTM dibatasi panjang + charset di sini; app tetap memvalidasi
+        // ulang saat membaca referrer, ini hanya supaya link tidak membawa sampah.
+        function clean(name) {
+          var raw = params.get(name);
+          if (!raw || raw.length > 64) return null;
+          return /^[A-Za-z0-9_.-]+$/.test(raw) ? raw : null;
+        }
+
+        var referrer = new URLSearchParams();
+        ['utm_source', 'utm_medium', 'utm_campaign', 'ref'].forEach(function (key) {
+          var value = clean(key);
+          if (value) referrer.set(key, value);
+        });
+
+        var playUrl =
+          'https://play.google.com/store/apps/details?id=' + PACKAGE +
+          (referrer.toString()
+            ? '&referrer=' + encodeURIComponent(referrer.toString())
+            : '');
+        document.getElementById('play').href = playUrl;
+
+        // --- Android: paksa buka app bila terpasang --------------------------
+        // App Links terverifikasi akan menangkap link sebelum halaman ini tampil.
+        // Kalau halaman tetap terbuka (verifikasi belum aktif, atau dibuka dari
+        // in-app browser), intent:// tetap membuka app kalau ada.
+        if (/Android/i.test(navigator.userAgent)) {
+          var openApp = document.getElementById('open-app');
+          // Host diambil dari lokasi halaman, tidak ditulis tetap: halaman ini
+          // harus tetap benar kalau host share berpindah, dan intent HARUS
+          // menunjuk host yang sama dengan yang diverifikasi App Links.
+          openApp.href =
+            'intent://' + location.host + location.pathname + location.search +
+            '#Intent;scheme=https;package=' + PACKAGE +
+            ';S.browser_fallback_url=' + encodeURIComponent(playUrl) + ';end';
+          openApp.hidden = false;
+          document.getElementById('play').className = 'cta secondary';
+        }
+
+        // --- Pratinjau payload ------------------------------------------------
+        var idr = new Intl.NumberFormat('id-ID', {
+          style: 'currency',
+          currency: 'IDR',
+          maximumFractionDigits: 0
+        });
+        var num = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 });
+
+        function format(value, kind) {
+          if (kind === 'idr') return idr.format(value);
+          if (kind === 'pct') return num.format(value) + '%';
+          if (kind === 'months') {
+            var years = Math.floor(value / 12);
+            var months = Math.round(value % 12);
+            if (years && months) return years + ' th ' + months + ' bln';
+            if (years) return years + ' tahun';
+            return months + ' bulan';
+          }
+          return num.format(value);
+        }
+
+        function addRow(label, value) {
+          var row = document.createElement('div');
+          row.className = 'row';
+          var dt = document.createElement('dt');
+          dt.textContent = label;
+          var dd = document.createElement('dd');
+          dd.textContent = value;
+          row.appendChild(dt);
+          row.appendChild(dd);
+          document.getElementById('rows').appendChild(row);
+        }
+
+        function base64UrlToBytes(token) {
+          var b64 = token.replace(/-/g, '+').replace(/_/g, '/');
+          while (b64.length % 4) b64 += '=';
+          var raw = atob(b64);
+          var bytes = new Uint8Array(raw.length);
+          for (var i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+          return bytes;
+        }
+
+        async function inflate(bytes) {
+          // Dart memakai ZLibCodec (deflate ber-header zlib), jadi 'deflate'.
+          var stream = new Blob([bytes]).stream()
+            .pipeThrough(new DecompressionStream('deflate'));
+          var buffer = await new Response(stream).arrayBuffer();
+          if (buffer.byteLength > MAX_INFLATED_BYTES) throw new Error('too_large');
+          return new TextDecoder().decode(buffer);
+        }
+
+        async function renderPreview() {
+          var token = params.get('d');
+          if (!token || token.length > MAX_TOKEN_CHARS) return;
+          if (typeof DecompressionStream === 'undefined') return;
+
+          var data = JSON.parse(await inflate(base64UrlToBytes(token)));
+          if (!data || typeof data !== 'object') return;
+
+          if (typeof data.v === 'number' && data.v > PAYLOAD_VERSION) {
+            document.getElementById('lede').textContent =
+              'Link ini dibuat oleh CalFin versi lebih baru. Perbarui aplikasi ' +
+              'untuk membuka simulasinya.';
+            return;
+          }
+
+          var moduleName = MODULES[data.m];
+          if (!moduleName) return;
+          document.getElementById('lede').textContent =
+            'Seseorang membagikan simulasi ' + moduleName + ' kepada Anda.';
+
+          var inputs = data['in'] || {};
+          // Urutan label dulu supaya tampilan konsisten antar modul, sisanya
+          // menyusul agar field baru tidak hilang diam-diam.
+          var keys = Object.keys(LABELS).filter(function (k) { return k in inputs; })
+            .concat(Object.keys(inputs).filter(function (k) { return !(k in LABELS); }));
+
+          var shown = 0;
+          keys.forEach(function (key) {
+            var value = inputs[key];
+            if (typeof value !== 'number' || !isFinite(value) || value < 0) return;
+            var label = LABELS[key];
+            addRow(label ? label[0] : key, format(value, label ? label[1] : null));
+            shown++;
+          });
+
+          if (data.sc && typeof data.sc.normal === 'number') {
+            addRow('Skenario bunga',
+              num.format(data.sc.best) + '% – ' + num.format(data.sc.worst) + '%');
+            shown++;
+          }
+
+          if (shown) document.getElementById('preview').hidden = false;
+        }
+
+        // Link masuk selalu tidak dipercaya: kegagalan apa pun cukup berarti
+        // "tanpa pratinjau", tombol Play Store tetap berfungsi.
+        renderPreview().catch(function () {});
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.syaifuleffendi.calfin",
+      "sha256_cert_fingerprints": [
+        "F9:8D:BB:B3:D9:9A:2D:7C:8C:B6:2C:07:FF:F8:49:0D:FA:2E:E3:C8:E0:FA:25:3E:22:AD:2F:32:9B:5D:0A:93"
+      ]
+    }
+  }
+]
